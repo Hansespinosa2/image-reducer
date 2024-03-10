@@ -3,6 +3,7 @@ import tensorflow as tf
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.cluster import KMeans
+from min_pool import MinPooling2D
 
 
 def get_file_paths(folder:str):
@@ -42,7 +43,7 @@ def display_and_save_images(output,path,crop_size):
 
 
 
-def reduce_image_folder(folder:str, crop_size:int=640, pool:int=4,color_restriction=None):
+def reduce_image_folder(folder:str, crop_size:int=640, pool:int=4,color_restriction=None,pool_type='max'):
     """
     Reduces the size of images in a folder by performing resizing, center cropping and max pooling.
     Place any images of desired size in a folder and call this function to reduce the size of the images.
@@ -54,20 +55,26 @@ def reduce_image_folder(folder:str, crop_size:int=640, pool:int=4,color_restrict
         crop_size (int, optional): The size of the smallest crop to be performed on the images. Defaults to 640.
         pool (int, optional): The size of the max pooling window. Defaults to 4.
         color_restriction (int, optional): The maximum number of colors allowed in the reduced images. Defaults to 10.
+        pool_type (str, optional): The type of pooling to be performed. Defaults to 'max'. Can pick 'avg
     """
 
     the_file_paths = get_file_paths(folder)
     the_images = make_images(the_file_paths,crop_size,color_restriction)
     the_images = tf.keras.layers.CenterCrop(height=crop_size,width=crop_size)(the_images)
 
-    max_pool = tf.keras.layers.MaxPool2D(pool_size=pool)
+    if pool_type == 'avg':
+        max_pool = tf.keras.layers.AvgPool2D(pool_size=pool)
+    elif pool_type == 'min':
+        max_pool = MinPooling2D(pool_size=pool)
+    else:
+        max_pool = tf.keras.layers.MaxPool2D(pool_size=pool)
 
     output = max_pool(the_images)
 
-    if not os.path.exists(folder + '_reduced'):
-        os.makedirs(folder + '_reduced')
+    if not os.path.exists(folder + '_reduced' + '_' + pool_type):
+        os.makedirs(folder + '_reduced' + '_' + pool_type)
 
-    display_and_save_images(output,folder + '_reduced',crop_size)
+    display_and_save_images(output,folder + '_reduced' + '_' + pool_type,crop_size)
 
 
 
