@@ -30,18 +30,20 @@ def make_images(file_path_list:list,smallest_crop,color_restriction):
     return [crop_and_cut(path,smallest_crop,color_restriction) for path in file_path_list]
 
 
-def display_and_save_images(output,path):
+def display_and_save_images(output,path,smallest_crop):
     for i,img in enumerate(output):
         plt.imshow(np.array(img))
         plt.axis('off')
-        plt.savefig(path + '/' + f'{i}.png',transparent=True)
+        # plt.savefig(path + '/' + f'{i}.png',transparent=True,dpi=smallest_crop)
+        plt.imsave(fname=path + '/' + f'{i}.png', arr=np.array(img), format='png')
 
     
 
 
 
 
-def reduce_image_folder(folder:str, smallest_crop:int=320, pool:int=4,color_restriction=10):
+def reduce_image_folder(folder:str, smallest_crop:int=640, pool:int=4,color_restriction=10):
+    
     the_file_paths = get_file_paths(folder)
     the_images = make_images(the_file_paths,smallest_crop,color_restriction)
     the_images = tf.keras.layers.CenterCrop(height=smallest_crop,width=smallest_crop)(the_images)
@@ -53,7 +55,7 @@ def reduce_image_folder(folder:str, smallest_crop:int=320, pool:int=4,color_rest
     if not os.path.exists(folder + '_reduced'):
         os.makedirs(folder + '_reduced')
 
-    display_and_save_images(output,folder + '_reduced')
+    display_and_save_images(output,folder + '_reduced',smallest_crop)
 
 
 
