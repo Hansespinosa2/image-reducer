@@ -42,8 +42,20 @@ def display_and_save_images(output,path,smallest_crop):
 
 
 
-def reduce_image_folder(folder:str, smallest_crop:int=640, pool:int=4,color_restriction=10):
-    
+def reduce_image_folder(folder:str, smallest_crop:int=640, pool:int=4,color_restriction=None):
+    """
+    Reduces the size of images in a folder by performing resizing, center cropping and max pooling.
+    Place any images of desired size in a folder and call this function to reduce the size of the images.
+    By default, the image will be pixellated and reduced to a 160x160 image.
+    Using smallest_crop of 320 and a pool of 4 will reduce the image to 80x80.
+
+    Args:
+        folder (str): The path to the folder containing the images.
+        smallest_crop (int, optional): The size of the smallest crop to be performed on the images. Defaults to 640.
+        pool (int, optional): The size of the max pooling window. Defaults to 4.
+        color_restriction (int, optional): The maximum number of colors allowed in the reduced images. Defaults to 10.
+    """
+
     the_file_paths = get_file_paths(folder)
     the_images = make_images(the_file_paths,smallest_crop,color_restriction)
     the_images = tf.keras.layers.CenterCrop(height=smallest_crop,width=smallest_crop)(the_images)
