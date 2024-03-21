@@ -21,10 +21,11 @@ def segment_colors(an_image,n_clusters):
 
 def crop_and_cut(file_path,crop_size,n_clusters):
     an_image = plt.imread(file_path)
+    an_image = tf.keras.layers.Resizing(crop_size,crop_size,crop_to_aspect_ratio=True)(an_image)
     if n_clusters is not None:        
         an_image = segment_colors(an_image,n_clusters)
 
-    an_image = tf.keras.layers.Resizing(crop_size,crop_size,crop_to_aspect_ratio=True)(an_image)
+
     return np.array(an_image)
 
 def make_images(file_path_list:list,crop_size,color_restriction):
